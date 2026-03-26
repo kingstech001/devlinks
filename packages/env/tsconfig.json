@@ -1,0 +1,3 @@
+{
+  "extends": "@devlinks/config/tsconfig.base.json"
+}

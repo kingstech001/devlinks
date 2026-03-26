@@ -1,0 +1,32 @@
+{
+  "name": "devlinks",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "type": "module",
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "check-types": "turbo check-types",
+    "dev:native": "turbo -F native dev",
+    "dev:web": "turbo -F web dev",
+    "db:push": "turbo -F @devlinks/db db:push",
+    "db:studio": "turbo -F @devlinks/db db:studio",
+    "db:generate": "turbo -F @devlinks/db db:generate",
+    "db:migrate": "turbo -F @devlinks/db db:migrate"
+  },
+  "dependencies": {
+    "@devlinks/env": "workspace:*",
+    "dotenv": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@devlinks/config": "workspace:*",
+    "@types/node": "^22.13.14",
+    "turbo": "^2.6.3",
+    "typescript": "catalog:"
+  },
+  "packageManager": "pnpm@10.32.1"
+}
