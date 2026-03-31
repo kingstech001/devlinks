@@ -14,6 +14,7 @@ import { authClient } from "@/lib/auth-client";
 
 import { Button } from "./ui/button";
 import { Skeleton } from "./ui/skeleton";
+import { ChevronDown, CircleUser } from "lucide-react";
 
 export default function UserMenu() {
   const router = useRouter();
@@ -33,8 +34,19 @@ export default function UserMenu() {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger render={<Button variant="outline" />}>
-        {session.user.name}
+      <DropdownMenuTrigger
+        render={
+          <Button
+            variant="outline"
+            className={
+              "bg-[#633CFF] hover:bg-[#5230d4] hover:text-white text-white rounded-[8px]"
+            }
+          />
+        }
+      >
+        <span className="hidden md:block">{session.user.name}</span>
+        <ChevronDown  className="hidden md:block"/>
+        <CircleUser  className="md:hidden"/>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="bg-card">
         <DropdownMenuGroup>

@@ -1,19 +1,20 @@
 import type { Metadata } from "next";
-
-import { Geist, Geist_Mono } from "next/font/google";
+import { Instrument_Sans, Geist_Mono } from "next/font/google";
 
 import "../index.css";
-import Header from "@/components/header";
 import Providers from "@/components/providers";
+import HeaderWrapper from "@/components/HeaderWrapper"; // new client component
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const instrumentSans = Instrument_Sans({
   subsets: ["latin"],
+  variable: "--font-sans",
+  display: "swap",
 });
 
 const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
   subsets: ["latin"],
+  variable: "--font-mono",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -21,17 +22,17 @@ export const metadata: Metadata = {
   description: "devlinks",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`${instrumentSans.variable} ${geistMono.variable}`}
+    >
+      <body className="antialiased">
         <Providers>
-          <div className="grid grid-rows-[auto_1fr] h-svh">
-            <Header />
+          <HeaderWrapper />
+          <div className="min-h-screen flex items-center justify-center">
             {children}
           </div>
         </Providers>

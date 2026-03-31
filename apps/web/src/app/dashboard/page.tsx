@@ -1,7 +1,6 @@
 import { auth } from "@devlinks/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-
 import { authClient } from "@/lib/auth-client";
 
 import Dashboard from "./dashboard";
@@ -12,7 +11,7 @@ export default async function DashboardPage() {
   });
 
   if (!session?.user) {
-    redirect("/login");
+    redirect("/");
   }
 
   return (
