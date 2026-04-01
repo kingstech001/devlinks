@@ -139,7 +139,7 @@ function ProfilePage() {
             </div>
             {/* Name preview */}
             {firstName || lastName ? (
-              <p className="text-sm font-semibold text-foreground text-center leading-tight">
+              <p className="text-sm font-semibold text-muted-foreground text-center leading-tight">
                 {firstName} {lastName}
               </p>
             ) : (

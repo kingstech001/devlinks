@@ -1,11 +1,12 @@
 "use client";
 
 import Image from "next/image";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { trpc } from "@/utils/trpc";
 import Link from "next/link";
 import { ModeToggle } from "@/components/mode-toggle";
 import { toast } from "sonner";
+import { authClient } from "@/lib/auth-client";
 
 const PLATFORMS = [
   { value: "github", label: "GitHub", bg: "#181717", text: "#ffffff" },
@@ -50,8 +51,28 @@ const getPlatform = (value: string) =>
 function PreviewPage() {
   const { data: links, isLoading: linksLoading } = trpc.getLinks.useQuery();
   const { data: profile } = trpc.getProfile.useQuery();
+  const [currentUser, setCurrentUser] = useState<{ id: string } | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const getCurrentUser = async () => {
+      try {
+        const session = await authClient.getSession();
+        if (session && session.data?.user) {
+          setCurrentUser({ id: session.data.user.id });
+        }
+      } catch (error) {
+        console.error("Failed to get session:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    getCurrentUser();
+  }, []);
 
   const hasLinks = links && links.length > 0;
+  const isOwner = currentUser && profile && currentUser.id === profile.userId;
 
   const avatarUrl = profile?.image ?? null;
   const firstName = profile?.firstName ?? "";
@@ -61,36 +82,45 @@ function PreviewPage() {
   return (
     <div className="min-h-screen flex flex-col">
       {/* Purple top banner */}
-      <div className="hidden sm:block bg-[#633CFF] rounded-b-[32px] h-[357px] w-full absolute top-0 left-0 z-0" />
+      <div className="hidden sm:block bg-[#633CFF] rounded-b-[32px] h-89.25 w-full absolute top-0 left-0 z-0" />
 
-      {/* Header */}
-      <div className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between px-6 py-4 sm:px-10 sm:py-6 bg-primary-foreground max-w-[1392px] mx-auto mt-[24px] rounded-[12px]">
-        <Link
-          href="/profile"
-          className="bg-white border border-[#633CFF] text-[#633CFF] font-semibold px-6 py-2.5 rounded-lg hover:bg-[#EFEBFF] transition-colors text-sm"
-        >
-          Back to Editor
-        </Link>
-        <div className="flex items-center justify-center gap-2">
-          <button
-  onClick={() => {
-    navigator.clipboard.writeText(window.location.href).then(() => {
-      toast.success("Link copied to clipboard!");
-    }).catch(() => {
-      toast.error("Failed to copy link.");
-    });
-  }}
-  className="bg-[#633CFF] text-white font-semibold px-6 py-2.5 rounded-lg hover:bg-[#4e2fe0] transition-colors text-sm"
->
-  Share Link
-</button>
+      {/* Header - Only show if user is the profile owner */}
+      {isOwner && (
+        <div className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between px-6 py-4 sm:px-10 sm:py-6 bg-primary-foreground max-w-348 mx-auto mt-6 rounded-2xl">
+          <Link
+            href="/profile"
+            className="bg-white border border-[#633CFF] text-[#633CFF] font-semibold px-6 py-2.5 rounded-lg hover:bg-[#EFEBFF] transition-colors text-sm"
+          >
+            Back to Editor
+          </Link>
+          <div className="flex items-center justify-center gap-2">
+            <button
+      onClick={() => {
+        navigator.clipboard.writeText(window.location.href).then(() => {
+          toast.success("Link copied to clipboard!");
+        }).catch(() => {
+          toast.error("Failed to copy link.");
+        });
+      }}
+      className="bg-[#633CFF] text-white font-semibold px-6 py-2.5 rounded-lg hover:bg-[#4e2fe0] transition-colors text-sm"
+    >
+      Share Link
+    </button>
+            <ModeToggle />
+          </div>
+        </div>
+      )}
+
+      {/* Theme toggle for public visitors */}
+      {!isOwner && !isLoading && (
+        <div className="absolute top-6 right-6 z-10">
           <ModeToggle />
         </div>
-      </div>
+      )}
 
       {/* Card */}
-      <div className="relative top-28 z-10 flex items-center justify-center flex-1 pb-20 pt-10 px-4">
-        <div className="sm:bg-card rounded-3xl sm:shadow-2xl p-10 flex flex-col items-center gap-4 w-full max-w-[349px]">
+      <div className={`relative z-10 flex items-center justify-center flex-1 pb-20 pt-10 px-4 ${isOwner ? "top-28" : "top-6"}`}>
+        <div className="sm:bg-card rounded-3xl sm:shadow-2xl p-10 flex flex-col items-center gap-4 w-full max-w-87.25">
           {/* Avatar */}
           <div className="w-24 h-24 rounded-full overflow-hidden ring-4 ring-[#633CFF] ring-offset-2 flex items-center justify-center bg-muted">
             {avatarUrl ? (

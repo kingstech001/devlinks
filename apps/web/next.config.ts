@@ -1,3 +1,4 @@
+import "dotenv/config";
 import "@devlinks/env/web";
 import type { NextConfig } from "next";
 
