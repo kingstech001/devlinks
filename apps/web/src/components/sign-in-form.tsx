@@ -1,4 +1,5 @@
 import { useForm } from "@tanstack/react-form";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import z from "zod";
@@ -18,7 +19,14 @@ export default function SignInForm({
   onSwitchToSignUp: () => void;
 }) {
   const router = useRouter();
-  const { isPending } = authClient.useSession();
+  const { data: session, isPending } = authClient.useSession();
+
+  useEffect(() => {
+    if (!isPending && session) {
+      router.replace("/links");
+      router.refresh();
+    }
+  }, [isPending, router, session]);
 
   const form = useForm({
     defaultValues: {
@@ -33,7 +41,8 @@ export default function SignInForm({
         },
         {
           onSuccess: () => {
-            router.push("/links");
+            router.replace("/links");
+            router.refresh();
             toast.success("Sign in successful");
           },
           onError: (error) => {
