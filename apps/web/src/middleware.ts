@@ -1,13 +1,12 @@
-import { auth } from "@devlinks/auth";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
-export default async function middleware(req: NextRequest) {
-  const session = await auth.api.getSession({
-    headers: req.headers,
-  });
+const SESSION_COOKIE_NAME = "session_token";
 
-  if (!session) {
+export default function middleware(req: NextRequest) {
+  const sessionCookie = req.cookies.get(SESSION_COOKIE_NAME);
+
+  if (!sessionCookie?.value) {
     return NextResponse.redirect(new URL("/", req.url));
   }
 
