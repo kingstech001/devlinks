@@ -129,7 +129,7 @@ export default function PreviewPageClient({
       )}
 
       {!isOwner && !isLoading && (
-        <div className="absolute top-6 right-6 z-10">
+        <div className="absolute top-6 right-6 z-50">
           <ModeToggle />
         </div>
       )}
