@@ -26,6 +26,12 @@ export const appRouter = router({
       .where(eq(links.userId, ctx.session.user.id));
   }),
 
+  getPublicLinks: publicProcedure
+    .input(z.object({ userId: z.string() }))
+    .query(async ({ input }) => {
+      return await db.select().from(links).where(eq(links.userId, input.userId));
+    }),
+
   addLink: protectedProcedure
     .input(z.object({ title: z.string(), url: z.string() }))
     .mutation(async ({ ctx, input }) => {
@@ -80,6 +86,17 @@ export const appRouter = router({
 
     return result[0] ?? null;
   }),
+
+  getPublicProfile: publicProcedure
+    .input(z.object({ userId: z.string() }))
+    .query(async ({ input }) => {
+      const result = await db
+        .select()
+        .from(profile)
+        .where(eq(profile.userId, input.userId));
+
+      return result[0] ?? null;
+    }),
 
   upsertProfile: protectedProcedure
     .input(

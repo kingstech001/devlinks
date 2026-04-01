@@ -1,12 +1,12 @@
 "use client";
 
-import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { trpc } from "@/utils/trpc";
 import Link from "next/link";
 import { ModeToggle } from "@/components/mode-toggle";
 import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
+import { useSearchParams } from "next/navigation";
 
 const PLATFORMS = [
   { value: "github", label: "GitHub", bg: "#181717", text: "#ffffff" },
@@ -49,10 +49,21 @@ const getPlatform = (value: string) =>
   };
 
 function PreviewPage() {
-  const { data: links, isLoading: linksLoading } = trpc.getLinks.useQuery();
-  const { data: profile } = trpc.getProfile.useQuery();
+  const searchParams = useSearchParams();
   const [currentUser, setCurrentUser] = useState<{ id: string } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const sharedUserId = searchParams.get("userId");
+
+  const viewedUserId = sharedUserId ?? currentUser?.id;
+
+  const { data: links, isLoading: linksLoading } = trpc.getPublicLinks.useQuery(
+    { userId: viewedUserId ?? "" },
+    { enabled: !!viewedUserId },
+  );
+  const { data: profile } = trpc.getPublicProfile.useQuery(
+    { userId: viewedUserId ?? "" },
+    { enabled: !!viewedUserId },
+  );
 
   useEffect(() => {
     const getCurrentUser = async () => {
@@ -72,7 +83,7 @@ function PreviewPage() {
   }, []);
 
   const hasLinks = links && links.length > 0;
-  const isOwner = currentUser && profile && currentUser.id === profile.userId;
+  const isOwner = !!currentUser && !!viewedUserId && currentUser.id === viewedUserId;
 
   const avatarUrl = profile?.image ?? null;
   const firstName = profile?.firstName ?? "";
@@ -95,17 +106,22 @@ function PreviewPage() {
           </Link>
           <div className="flex items-center justify-center gap-2">
             <button
-      onClick={() => {
-        navigator.clipboard.writeText(window.location.href).then(() => {
-          toast.success("Link copied to clipboard!");
-        }).catch(() => {
-          toast.error("Failed to copy link.");
-        });
-      }}
-      className="bg-[#633CFF] text-white font-semibold px-6 py-2.5 rounded-lg hover:bg-[#4e2fe0] transition-colors text-sm"
-    >
-      Share Link
-    </button>
+              onClick={() => {
+                navigator.clipboard
+                  .writeText(
+                    `${window.location.origin}/preview?userId=${viewedUserId}`,
+                  )
+                  .then(() => {
+                    toast.success("Link copied to clipboard!");
+                  })
+                  .catch(() => {
+                    toast.error("Failed to copy link.");
+                  });
+              }}
+              className="bg-[#633CFF] text-white font-semibold px-6 py-2.5 rounded-lg hover:bg-[#4e2fe0] transition-colors text-sm"
+            >
+              Share Link
+            </button>
             <ModeToggle />
           </div>
         </div>
@@ -119,7 +135,9 @@ function PreviewPage() {
       )}
 
       {/* Card */}
-      <div className={`relative z-10 flex items-center justify-center flex-1 pb-20 pt-10 px-4 ${isOwner ? "top-28" : "top-6"}`}>
+      <div
+        className={`relative z-10 flex items-center justify-center flex-1 pb-20 pt-10 px-4 ${isOwner ? "top-28" : "top-6"}`}
+      >
         <div className="sm:bg-card rounded-3xl sm:shadow-2xl p-10 flex flex-col items-center gap-4 w-full max-w-87.25">
           {/* Avatar */}
           <div className="w-24 h-24 rounded-full overflow-hidden ring-4 ring-[#633CFF] ring-offset-2 flex items-center justify-center bg-muted">
