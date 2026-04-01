@@ -47,6 +47,8 @@ const getPlatform = (value: string) =>
     text: "#ffffff",
   };
 
+import { authClient } from "@/lib/auth-client";
+
 function ProfilePage() {
   const { data: links, isLoading: linksLoading } = trpc.getLinks.useQuery();
   const { data: profile, isLoading: profileLoading } = trpc.getProfile.useQuery();
@@ -58,6 +60,15 @@ function ProfilePage() {
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+
+  const { data: session, isPending } = authClient.useSession();
+
+  // Redirect to home if not authenticated
+  React.useEffect(() => {
+    if (!isPending && !session) {
+      router.push("/");
+    }
+  }, [session, isPending, router]);
 
   // Initialize form with existing profile data
   React.useEffect(() => {

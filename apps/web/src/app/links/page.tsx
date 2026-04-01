@@ -234,11 +234,22 @@ function PlatformDropdown({
   );
 }
 
+import { authClient } from "@/lib/auth-client";
+
 function LinksPage() {
   const [mounted, setMounted] = useState(false);
   const [links, setLinks] = useState<LinkEntry[]>([]);
   const [initialized, setInitialized] = useState(false);
   const router = useRouter();
+
+  const { data: session, isPending } = authClient.useSession();
+
+  // Redirect to home if not authenticated
+  useEffect(() => {
+    if (!isPending && !session) {
+      router.push("/");
+    }
+  }, [session, isPending, router]);
 
   const utils = trpc.useUtils();
 
