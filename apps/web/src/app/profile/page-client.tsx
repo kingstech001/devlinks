@@ -9,6 +9,9 @@ import { toast } from "sonner";
 import { trpc } from "@/utils/trpc";
 
 const PLATFORMS = [
+  { value: "portfolio", label: "Portfolio", bg: "#2D3748", text: "#ffffff" },
+  { value: "project", label: "Project", bg: "#0F766E", text: "#ffffff" },
+  { value: "website", label: "Website", bg: "#2563EB", text: "#ffffff" },
   { value: "github", label: "GitHub", bg: "#181717", text: "#ffffff" },
   { value: "youtube", label: "YouTube", bg: "#FF0000", text: "#ffffff" },
   { value: "linkedin", label: "LinkedIn", bg: "#0A66C2", text: "#ffffff" },
